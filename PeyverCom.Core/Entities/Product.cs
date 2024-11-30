@@ -18,5 +18,6 @@ namespace PeyverCom.Core.Entities
         public ICollection<Auction> Auctions { get; set; }
         public DateTime CreatedAd { get; set; }
         public int Stock {  get; set; }
+        public ICollection<Comment> Comments { get; set; }
     }
 }

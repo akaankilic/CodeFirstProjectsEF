@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PeyverCom.Core.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PeyverCom.Data.PeyveyComDAL
 {
@@ -17,7 +12,9 @@ namespace PeyverCom.Data.PeyveyComDAL
         public DbSet<Auction> Auctions { get; set; }
         public DbSet<Offer> Offers { get; set; }
         public DbSet<Sale> Sales { get; set; }
-        long
+        public DbSet<Message> Messages { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -35,7 +32,21 @@ namespace PeyverCom.Data.PeyveyComDAL
             modelBuilder.Entity<Sale>().HasOne(s => s.Offer)
                         .WithOne().HasForeignKey<Sale>(s => s.OfferId);
             modelBuilder.Entity<Sale>().HasOne(s => s.Customer)
-                        .WithMany(c => c.Sales).HasForeignKey(s => s.CustomerId);    
+                        .WithMany(c => c.Sales).HasForeignKey(s => s.CustomerId);
+            modelBuilder.Entity<Message>(entity =>
+            {
+                entity.HasKey(m => m.MessageId);
+                entity.HasOne(m => m.Sender).WithMany().HasForeignKey(m => m.SenderId).OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(m => m.Receiver).WithMany().HasForeignKey(m => m.ReceiverId).OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<Comment>(entity =>
+            {
+                entity.HasKey(c => c.CommentId);
+                entity.HasOne(c => c.Customer).WithMany(c => c.Comments).HasForeignKey(m => m.CustomerId);
+
+                entity.HasOne(c => c.Product).WithMany(c => c.Comments).HasForeignKey(m => m.ProductId);
+            });
         }
     }
 }
