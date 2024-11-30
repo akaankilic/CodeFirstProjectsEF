@@ -17,5 +17,6 @@ namespace PeyverCom.Core.Entities
         public DateTime SaleDate { get; set; }
         public int OfferId { get; set; }
         public Offer Offer { get; set; }
+        public ICollection<CustomerSale> CustomerSales { get; set; }
     }
 }
