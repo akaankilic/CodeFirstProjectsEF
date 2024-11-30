@@ -8,7 +8,7 @@ namespace PeyverCom.Core.Entities
 {
     public class Sale
     {
-        public int SaleID { get; set; }
+        public int SaleId { get; set; }
         public int AuctionId { get; set; }
         public Auction Auction { get; set; }
         public int CustomerId { get; set; }
