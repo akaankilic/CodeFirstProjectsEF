@@ -17,7 +17,7 @@ namespace PeyverCom.Data.PeyveyComDAL
         public DbSet<Auction> Auctions { get; set; }
         public DbSet<Offer> Offers { get; set; }
         public DbSet<Sale> Sales { get; set; }
-        long
+        public DbSet<Category> Categories { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -36,6 +36,26 @@ namespace PeyverCom.Data.PeyveyComDAL
                         .WithOne().HasForeignKey<Sale>(s => s.OfferId);
             modelBuilder.Entity<Sale>().HasOne(s => s.Customer)
                         .WithMany(c => c.Sales).HasForeignKey(s => s.CustomerId);    
+            modelBuilder.Entity<CustomerProduct>().HasKey(cp => new
+            { 
+                cp.CustomerId,
+                cp.ProductId 
+            });
+            modelBuilder.Entity<CustomerProduct>().HasOne(p => p.Customer)
+                        .WithMany(c => c.CustomerProducts).HasForeignKey(p => p.CustomerId);
+            modelBuilder.Entity<CustomerProduct>().HasOne(c => c.Product)
+                        .WithMany( p => p.CustomerProducts).HasForeignKey(c => c.ProductId);
+            modelBuilder.Entity<Product>().HasOne(p => p.Category)
+                        .WithMany(c => c.Products).HasForeignKey (c => c.CategoryId);
+            modelBuilder.Entity<CustomerSale>().HasKey(s => new
+            {
+                s.CustomerId,
+                s.SaleId
+            });
+            modelBuilder.Entity<CustomerSale>().HasOne(s => s.Customer)
+                        .WithMany(s => s.CustomerSales).HasForeignKey(s => s.CustomerId);
+            modelBuilder.Entity<CustomerSale>().HasOne(s => s.Sale)
+                      .WithMany(s => s.CustomerSales).HasForeignKey(s => s.SaleId);
         }
     }
 }

@@ -20,6 +20,8 @@ namespace PeyverCom.Core.Entities
         public ICollection<Offer> Offers { get; set; }
 
         public ICollection<Sale> Sales { get; set; }
+        public ICollection<CustomerProduct> CustomerProducts { get; set; }
+        public ICollection<CustomerSale> CustomerSales { get; set; }
 
     }
 }
