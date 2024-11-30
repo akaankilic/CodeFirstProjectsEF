@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
@@ -22,6 +22,8 @@ namespace PeyverCom.Core.Entities
         public ICollection<Sale> Sales { get; set; }
         public ICollection<CustomerProduct> CustomerProducts { get; set; }
         public ICollection<CustomerSale> CustomerSales { get; set; }
+        public ICollection<Message> Messages { get; set; }
+        public ICollection<Comment> Comments { get; set; }
 
     }
 }

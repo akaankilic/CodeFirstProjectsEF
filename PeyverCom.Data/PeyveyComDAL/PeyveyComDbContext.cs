@@ -1,10 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PeyverCom.Core.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PeyverCom.Data.PeyveyComDAL
 {
@@ -17,7 +12,9 @@ namespace PeyverCom.Data.PeyveyComDAL
         public DbSet<Auction> Auctions { get; set; }
         public DbSet<Offer> Offers { get; set; }
         public DbSet<Sale> Sales { get; set; }
-        public DbSet<Category> Categories { get; set; }
+        public DbSet<Message> Messages { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -35,27 +32,21 @@ namespace PeyverCom.Data.PeyveyComDAL
             modelBuilder.Entity<Sale>().HasOne(s => s.Offer)
                         .WithOne().HasForeignKey<Sale>(s => s.OfferId);
             modelBuilder.Entity<Sale>().HasOne(s => s.Customer)
-                        .WithMany(c => c.Sales).HasForeignKey(s => s.CustomerId);    
-            modelBuilder.Entity<CustomerProduct>().HasKey(cp => new
-            { 
-                cp.CustomerId,
-                cp.ProductId 
-            });
-            modelBuilder.Entity<CustomerProduct>().HasOne(p => p.Customer)
-                        .WithMany(c => c.CustomerProducts).HasForeignKey(p => p.CustomerId);
-            modelBuilder.Entity<CustomerProduct>().HasOne(c => c.Product)
-                        .WithMany( p => p.CustomerProducts).HasForeignKey(c => c.ProductId);
-            modelBuilder.Entity<Product>().HasOne(p => p.Category)
-                        .WithMany(c => c.Products).HasForeignKey (c => c.CategoryId);
-            modelBuilder.Entity<CustomerSale>().HasKey(s => new
+                        .WithMany(c => c.Sales).HasForeignKey(s => s.CustomerId);
+            modelBuilder.Entity<Message>(entity =>
             {
-                s.CustomerId,
-                s.SaleId
+                entity.HasKey(m => m.MessageId);
+                entity.HasOne(m => m.Sender).WithMany().HasForeignKey(m => m.SenderId).OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(m => m.Receiver).WithMany().HasForeignKey(m => m.ReceiverId).OnDelete(DeleteBehavior.Restrict);
             });
-            modelBuilder.Entity<CustomerSale>().HasOne(s => s.Customer)
-                        .WithMany(s => s.CustomerSales).HasForeignKey(s => s.CustomerId);
-            modelBuilder.Entity<CustomerSale>().HasOne(s => s.Sale)
-                      .WithMany(s => s.CustomerSales).HasForeignKey(s => s.SaleId);
+            modelBuilder.Entity<Comment>(entity =>
+            {
+                entity.HasKey(c => c.CommentId);
+                entity.HasOne(c => c.Customer).WithMany(c => c.Comments).HasForeignKey(m => m.CustomerId);
+
+                entity.HasOne(c => c.Product).WithMany(c => c.Comments).HasForeignKey(m => m.ProductId);
+            });
         }
     }
 }
