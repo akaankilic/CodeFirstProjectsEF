@@ -10,7 +10,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<PeyverComDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<PeyverComDbContext>(options =>
+options.UseSqlServer(builder.Configuration.GetConnectionString("PeyverComDb")));
 
 var app = builder.Build();
 
