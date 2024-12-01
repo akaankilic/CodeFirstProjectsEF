@@ -38,7 +38,7 @@ namespace PeyverCom.WebApi.Controllers
             return Ok(product); 
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<ActionResult<Product>> AddProduct(Product product)
         {
             if (product == null)
@@ -51,7 +51,7 @@ namespace PeyverCom.WebApi.Controllers
             return CreatedAtAction(nameof(GetProductById), new { id = product.ProductId }, product);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("update/{id}")]
         public async Task<IActionResult> UpdateProduct(int id, Product product)
         {
             if (id != product.ProductId)
@@ -71,7 +71,7 @@ namespace PeyverCom.WebApi.Controllers
             return NoContent(); 
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             try
