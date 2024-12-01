@@ -1,4 +1,5 @@
-﻿using PeyverCom.Core.Entities;
+﻿using PeyverCom.Core.DTO;
+using PeyverCom.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +11,11 @@ namespace PeyverCom.Service.Interfaces
 
         public interface IProductService
         {
-            Task AddProduct(Product product);              
-            Task UpdateProduct(Product product);        
-            Task DeleteProduct(int productId);              
-            Task<Product?> GetProductById(int productId);     
-            Task<IEnumerable<Product>> GetAllProducts();     
-            Task DeleteExpiredProducts();                    
-        }
+        Task<IEnumerable<Product>> GetAllProducts();
+        Task<Product> GetProductById(int id);
+        Task AddProduct(ProductCreateDto productDto);
+        Task UpdateProduct(Product product);
+        Task DeleteProduct(int id);
+        Task DeleteExpiredProducts();
+    }
 }

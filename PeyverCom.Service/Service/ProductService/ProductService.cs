@@ -1,84 +1,64 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using PeyverCom.Core.DTO;
 using PeyverCom.Core.Entities;
-using PeyverCom.Data.PeyveyComDAL;
+using PeyverCom.Core.Models;
 using PeyverCom.Service.Interfaces;
+using PeyverCom.Service.Repository;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PeyverCom.Service
 {
     public class ProductService : IProductService
     {
-        private readonly PeyverComDbContext _context;
+        private readonly IProductRepository _productRepository;
 
-        public ProductService(PeyverComDbContext context)
+        public ProductService(IProductRepository productRepository)
         {
-            _context = context;
-        }
-
-        public async Task AddProduct(Product product)
-        {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
-
-            product.CreatedAd = DateTime.Now;  
-            await _context.Products.AddAsync(product); 
-            await _context.SaveChangesAsync();  
-        }
-
-        public async Task UpdateProduct(Product updatedProduct)
-        {
-            var product = await _context.Products.FindAsync(updatedProduct.ProductId); 
-            if (product == null)
-                throw new KeyNotFoundException("Ürün bulunamadı.");
-
-            product.Name = updatedProduct.Name;
-            product.Description = updatedProduct.Description;
-            product.StartingPrice = updatedProduct.StartingPrice;
-            product.Stock = updatedProduct.Stock;
-            product.CategoryId = updatedProduct.CategoryId;
-            product.CustomerId = updatedProduct.CustomerId;
-
-            _context.Products.Update(product);  
-            await _context.SaveChangesAsync();  
-        }
-
-        public async Task DeleteProduct(int productId)
-        {
-            var product = await _context.Products.FindAsync(productId); 
-            if (product == null)
-                throw new KeyNotFoundException("Ürün bulunamadı.");
-
-            _context.Products.Remove(product); 
-            await _context.SaveChangesAsync(); 
-        }
-
-        public async Task<Product?> GetProductById(int productId)
-        {
-            return await _context.Products
-                .Include(p => p.Customer)
-                .Include(p => p.Category)  
-                .FirstOrDefaultAsync(p => p.ProductId == productId);
+            _productRepository = productRepository;
         }
 
         public async Task<IEnumerable<Product>> GetAllProducts()
         {
-            return await _context.Products
-                .Include(p => p.Customer)
-                .Include(p => p.Category)
-                .ToListAsync();
+            return await _productRepository.GetAllProducts();
+        }
+
+        public async Task<Product> GetProductById(int id)
+        {
+            return await _productRepository.GetProductById(id);
+        }
+
+        public async Task AddProduct(ProductCreateDto productDto)
+        {
+            var product = new Product
+            {
+                Name = productDto.Name,
+                Description = productDto.Description,
+                ProductCategoryId = productDto.ProductCategoryId,
+                StartingPrice = productDto.StartingPrice,
+                CustomerId = productDto.CustomerId,
+                Stock = productDto.Stock,
+                CategoryId = productDto.CategoryId, 
+                CreatedAd = DateTime.UtcNow 
+            };
+
+            await _productRepository.AddProduct(product);
+        }
+
+        public async Task UpdateProduct(Product product)
+        {
+            await _productRepository.UpdateProduct(product);
+        }
+
+        public async Task DeleteProduct(int id)
+        {
+            await _productRepository.DeleteProduct(id);
         }
 
         public async Task DeleteExpiredProducts()
         {
-            var oneWeekAgo = DateTime.Now.AddDays(-7); 
-            var expiredProducts = await _context.Products
-                .Where(p => p.CreatedAd <= oneWeekAgo)
-                .ToListAsync(); 
-
-            if (expiredProducts.Any())
-            {
-                _context.Products.RemoveRange(expiredProducts);  
-                await _context.SaveChangesAsync();  
-            }
+            await _productRepository.DeleteExpiredProducts();
         }
     }
 }

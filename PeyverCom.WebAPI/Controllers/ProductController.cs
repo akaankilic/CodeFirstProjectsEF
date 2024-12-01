@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PeyverCom.Core.DTO;
 using PeyverCom.Core.Entities;
 using PeyverCom.Service;
 using PeyverCom.Service.Interfaces;
@@ -37,18 +38,17 @@ namespace PeyverCom.WebApi.Controllers
 
             return Ok(product); 
         }
-
         [HttpPost("add")]
-        public async Task<ActionResult<Product>> AddProduct(Product product)
+        public async Task<ActionResult> AddProduct([FromBody] ProductCreateDto productDto)
         {
-            if (product == null)
+            if (productDto == null)
             {
-                return BadRequest("Ürün verisi boş olamaz."); 
+                return BadRequest("Ürün verisi boş olamaz.");
             }
 
-            await _productService.AddProduct(product);
+            await _productService.AddProduct(productDto);
 
-            return CreatedAtAction(nameof(GetProductById), new { id = product.ProductId }, product);
+            return StatusCode(201); 
         }
 
         [HttpPut("update/{id}")]
