@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PeyverCom.Core.Interface;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PeyverCom.Core.Entities
 {
-    public class Auction
+    public class Auction :IEntities
     {
         public int AuctionID { get; set; }
         public DateTime StartTime { get; set; }

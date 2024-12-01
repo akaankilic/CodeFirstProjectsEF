@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PeyverCom.Core.Interface;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PeyverCom.Core.Entities
 {
-    public class Offer
+    public class Offer : IEntities
     {
         public int OfferId { get; set; }
         public decimal Amount { get; set; }

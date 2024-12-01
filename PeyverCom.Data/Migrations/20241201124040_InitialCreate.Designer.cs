@@ -12,7 +12,7 @@ using PeyverCom.Data.PeyveyComDAL;
 namespace PeyverCom.Data.Migrations
 {
     [DbContext(typeof(PeyverComDbContext))]
-    [Migration("20241130212147_InitialCreate")]
+    [Migration("20241201124040_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -124,7 +124,15 @@ namespace PeyverCom.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Password")
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordSalt")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

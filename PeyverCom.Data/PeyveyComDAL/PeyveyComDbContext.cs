@@ -52,6 +52,12 @@ namespace PeyverCom.Data.PeyveyComDAL
             modelBuilder.Entity<CustomerSale>().HasOne(cs => cs.Sale)
                         .WithMany(s => s.CustomerSales).HasForeignKey(cs => cs.SaleId).OnDelete(DeleteBehavior.NoAction);
             modelBuilder.Entity<CustomerSale>().HasKey(cs => cs.Id);
+            modelBuilder.Entity<Customer>().HasMany(c => c.Products)
+                        .WithOne(p => p.Customer).HasForeignKey(p => p.CustomerId);
+            modelBuilder.Entity<Customer>().HasMany(c => c.Offers)
+                        .WithOne(o => o.Customer).HasForeignKey(o => o.CustomerId);
+            modelBuilder.Entity<Customer>().Property(p => p.PasswordHash).IsRequired();
+            modelBuilder.Entity<Customer>().Property(p => p.PasswordSalt).IsRequired();
 
         }
     }
