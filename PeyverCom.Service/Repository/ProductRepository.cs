@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PeyverCom.Core.DTO;
 using PeyverCom.Core.Entities;
 using PeyverCom.Data.PeyveyComDAL;
-
 
 namespace PeyverCom.Service.Repository
 {
@@ -14,14 +14,37 @@ namespace PeyverCom.Service.Repository
             _context = context;
         }
 
-        public async Task<IEnumerable<Product>> GetAllProducts()
+        public async Task<IEnumerable<ProductDto>> GetAllProducts()
         {
-            return await _context.Products.Include(p => p.Category).ToListAsync();
+            return await _context.Products
+                .Select(p => new ProductDto
+                {
+                    ProductId = p.ProductId,
+                    Name = p.Name,
+                    Description = p.Description,
+                    StartingPrice = p.StartingPrice,
+                    Stock = p.Stock,
+                    CategoryId = p.CategoryId
+                })
+                .ToListAsync();
         }
 
-        public async Task<Product?> GetProductById(int id)
+        public async Task<ProductDto> GetProductById(int id)
         {
-            return await _context.Products.Include(p => p.Category).FirstOrDefaultAsync(p => p.ProductId == id);
+            var product = await _context.Products
+                .Where(p => p.ProductId == id)
+                .Select(p => new ProductDto
+                {
+                    ProductId = p.ProductId,
+                    Name = p.Name,
+                    Description = p.Description,
+                    StartingPrice = p.StartingPrice,
+                    Stock = p.Stock,
+                    CategoryId = p.CategoryId
+                })
+                .FirstOrDefaultAsync();
+
+            return product;
         }
 
         public async Task AddProduct(Product product)

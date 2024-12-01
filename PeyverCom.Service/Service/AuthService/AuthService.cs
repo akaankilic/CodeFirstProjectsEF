@@ -3,7 +3,6 @@ using PeyverCom.Core.Entities;
 using PeyverCom.Core.Helper;
 using PeyverCom.Core.Interfaces;
 using PeyverCom.Service.Repository;
-using System.Threading.Tasks;
 
 namespace PeyverCom.Service
 {

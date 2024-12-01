@@ -1,6 +1,5 @@
 ﻿using PeyverCom.Core.Interfaces;
 using System.Security.Cryptography;
-using System.Text;
 namespace PeyverCom.Core.Utilities
 {
     public class PasswordHasher : IPasswordHasher

@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using PeyverCom.Core.DTO;
 using PeyverCom.Core.Entities;
-using PeyverCom.Service;
 using PeyverCom.Service.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,31 +13,32 @@ namespace PeyverCom.WebApi.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
+        private readonly IMapper _mapper;
 
-        public ProductController(IProductService productService)
+        public ProductController(IProductService productService, IMapper mapper)
         {
             _productService = productService;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetAllProducts()
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetAllProducts()
         {
             var products = await _productService.GetAllProducts();
-            return Ok(products); 
+            return Ok(products);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProductById(int id)
+        public async Task<ActionResult<ProductDto>> GetProductById(int id)
         {
             var product = await _productService.GetProductById(id);
-
             if (product == null)
             {
-                return NotFound(); 
+                return NotFound();
             }
-
-            return Ok(product); 
+            return Ok(product);
         }
+
         [HttpPost("add")]
         public async Task<ActionResult> AddProduct([FromBody] ProductCreateDto productDto)
         {
@@ -47,7 +48,6 @@ namespace PeyverCom.WebApi.Controllers
             }
 
             await _productService.AddProduct(productDto);
-
             return StatusCode(201); 
         }
 
@@ -56,41 +56,25 @@ namespace PeyverCom.WebApi.Controllers
         {
             if (id != product.ProductId)
             {
-                return BadRequest("Ürün ID'si uyumsuz.");  
+                return BadRequest("Ürün ID'si uyumsuz.");
             }
 
-            try
-            {
-                await _productService.UpdateProduct(product);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound(); 
-            }
-
+            await _productService.UpdateProduct(product);
             return NoContent(); 
         }
 
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
-            try
-            {
-                await _productService.DeleteProduct(id);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();  
-            }
-
-            return NoContent();  
+            await _productService.DeleteProduct(id);
+            return NoContent();
         }
 
         [HttpDelete("DeleteExpired")]
         public async Task<IActionResult> DeleteExpiredProducts()
         {
             await _productService.DeleteExpiredProducts();
-            return NoContent();  
+            return NoContent();
         }
     }
 }

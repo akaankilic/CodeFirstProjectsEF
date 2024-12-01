@@ -1,11 +1,10 @@
 ﻿using PeyverCom.Core.DTO;
 using PeyverCom.Core.Entities;
-using PeyverCom.Core.Models;
 using PeyverCom.Service.Interfaces;
 using PeyverCom.Service.Repository;
+using AutoMapper;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace PeyverCom.Service
@@ -13,35 +12,30 @@ namespace PeyverCom.Service
     public class ProductService : IProductService
     {
         private readonly IProductRepository _productRepository;
+        private readonly IMapper _mapper;
 
-        public ProductService(IProductRepository productRepository)
+        public ProductService(IProductRepository productRepository, IMapper mapper)
         {
             _productRepository = productRepository;
+            _mapper = mapper;
         }
 
-        public async Task<IEnumerable<Product>> GetAllProducts()
+        public async Task<IEnumerable<ProductDto>> GetAllProducts()
         {
-            return await _productRepository.GetAllProducts();
+            var products = await _productRepository.GetAllProducts();
+            return _mapper.Map<IEnumerable<ProductDto>>(products);
         }
 
-        public async Task<Product> GetProductById(int id)
+        public async Task<ProductDto> GetProductById(int id)
         {
-            return await _productRepository.GetProductById(id);
+            var product = await _productRepository.GetProductById(id);
+            return product == null ? null : _mapper.Map<ProductDto>(product);
         }
 
         public async Task AddProduct(ProductCreateDto productDto)
         {
-            var product = new Product
-            {
-                Name = productDto.Name,
-                Description = productDto.Description,
-                ProductCategoryId = productDto.ProductCategoryId,
-                StartingPrice = productDto.StartingPrice,
-                CustomerId = productDto.CustomerId,
-                Stock = productDto.Stock,
-                CategoryId = productDto.CategoryId, 
-                CreatedAd = DateTime.UtcNow 
-            };
+            var product = _mapper.Map<Product>(productDto);
+            product.CreatedAd = DateTime.UtcNow;
 
             await _productRepository.AddProduct(product);
         }
