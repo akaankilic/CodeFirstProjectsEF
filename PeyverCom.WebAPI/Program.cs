@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using PeyverCom.Core.Helper;
 using PeyverCom.Core.Interfaces;
+using PeyverCom.Core.Models;
 using PeyverCom.Core.Utilities;
 using PeyverCom.Data.PeyveyComDAL;
+using PeyverCom.Service;
 using PeyverCom.Service.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,7 +17,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IPasswordHasher,PasswordHasher>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
-builder.Services.AddSingleton(new JWTTokenHelper("YourSecretKey", "YourIssuer", "YourAudience"));
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+builder.Services.AddSingleton<JWTTokenHelper>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddDbContext<PeyverComDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("PeyverComDb")));

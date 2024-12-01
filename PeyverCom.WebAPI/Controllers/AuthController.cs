@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PeyverCom.Core.DTO;
-using PeyverCom.Core.Entities;
-using PeyverCom.Core.Helper;
 using PeyverCom.Core.Interfaces;
-using PeyverCom.Service.Repository;
 
 namespace PeyverCom.WebAPI.Controllers
 {
@@ -11,52 +8,43 @@ namespace PeyverCom.WebAPI.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly ICustomerRepository _customerRepository;
-        private readonly IPasswordHasher _passwordHasher;
-        private readonly JWTTokenHelper _jwtTokenHelper;
+        private readonly IAuthService _authService;
 
-        public AuthController(ICustomerRepository customerRepository,IPasswordHasher passwordHasher,JWTTokenHelper jwtTokenHelper)
-        {   
-            _customerRepository = customerRepository;
-            _passwordHasher = passwordHasher;
-            _jwtTokenHelper = jwtTokenHelper;
+        public AuthController(IAuthService authService)
+        {
+            _authService = authService;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] CustomerRegisterDto registerDto)
         {
-            if (await _customerRepository.EmailExistsAsync(registerDto.Email))
+            try
             {
-                return BadRequest("Email is already use.");
+                var result = await _authService.RegisterAsync(registerDto);
+                return Ok(result);
             }
-            var hashedPassword = _passwordHasher.HashPassword(registerDto.Password,out var salt);
-            var newCustomer = new Customer
+            catch (Exception ex)
             {
-                Email = registerDto.Email,
-                PasswordHash = hashedPassword,
-                PasswordSalt = salt,
-                Name = registerDto.Name,
-                SurName= registerDto.SurName,
-                PhoneNumber = registerDto.PhoneNumber,
-                City = registerDto.City,
-                Address = registerDto.Address,
-            };
-
-            await _customerRepository.AddCustomerAsync(newCustomer);
-            return Ok("Customer registered succesfully");
+                return BadRequest(ex.Message); 
+            }
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody]CustomerLoginDto loginDto)
+        public async Task<IActionResult> Login([FromBody] CustomerLoginDto loginDto)
         {
-            var customer = await _customerRepository.GetCustomerByEmailAsync(loginDto.Email);
-
-            if (customer == null || !_passwordHasher.VerifyPassword(customer.PasswordHash, customer.PasswordSalt, loginDto.Password))
+            try
+            {
+                var token = await _authService.LoginAsync(loginDto);
+                return Ok(new { Token = token });
+            }
+            catch (UnauthorizedAccessException)
+            {
                 return Unauthorized("Invalid credentials.");
-
-            var token = _jwtTokenHelper.GenerateToken(customer.CustomerId.ToString());
-
-            return Ok(new { Token = token });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message); 
+            }
         }
     }
 }
