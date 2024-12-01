@@ -5,6 +5,7 @@ using PeyverCom.Core.Models;
 using PeyverCom.Core.Utilities;
 using PeyverCom.Data.PeyveyComDAL;
 using PeyverCom.Service;
+using PeyverCom.Service.Interfaces;
 using PeyverCom.Service.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,7 +21,7 @@ builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.AddSingleton<JWTTokenHelper>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-
+builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddDbContext<PeyverComDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("PeyverComDb")));
 
@@ -31,7 +32,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+}   
 
 app.UseHttpsRedirection();
 
